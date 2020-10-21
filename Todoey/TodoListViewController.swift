@@ -12,7 +12,10 @@ import UIKit
 */
 class TodoListViewController: UITableViewController {
     
-    let itemArray = ["Text Condor", "Text Nicc", "Text Nolaaaaaaaan"]
+    //Initializes user defaults:
+    let defaults = UserDefaults.standard
+    
+    var itemArray = ["Text Condor", "Text Nicc", "Text Nolaaaaaaaan"]
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -27,6 +30,50 @@ class TodoListViewController: UITableViewController {
         super.didReceiveMemoryWarning()
         //Dispose of any resources that can be recreated. 
     }
+    
+    //MARK: - Add New Item to List:
+    
+    @IBAction func addButtonPressed(_ sender: UIBarButtonItem) {
+        /*Creates new alert that prompts the user to type in a new to do list item:
+        */
+        var textField = UITextField()
+        let alert = UIAlertController(title: "Add New Item", message: "", preferredStyle: .alert)
+        let action = UIAlertAction(title: "Add Item", style: .default) { (action) in
+            /*The following happens once the user clicks the "Add Item" button on the alert:
+            */
+            print("Processed successfully.")
+            
+            //Appends new item to itemArray as enteredText:
+            self.itemArray.append(textField.text ?? "")
+            
+            //Saves user data in defaults with key "ToDoListArray":
+            self.defaults.set(self.itemArray, forKey: "ToDoListArray")
+            
+            //Reloads the data after the new item is added:
+            DispatchQueue.main.async {
+                self.tableView.reloadData()
+            }
+        }
+        
+        //Adds the action to the alert:
+        alert.addAction(action)
+        
+        /*Adds a textField to the alert so the user can enter text to add to the todo list:
+        */
+        alert.addTextField { (alertTextField) in
+            /*Sets the placeholder (grayed out) text to "New item":
+            */
+            textField = alertTextField
+            alertTextField.placeholder = "New item"
+            print(alertTextField.text ?? "\n")
+            textField.text = alertTextField.text ?? ""
+        }
+        
+        //Presents alert when the user presses the add button:
+        present(alert, animated: true, completion: nil)
+        
+    }
+    
 }
 
 //MARK: - TableView Datasource Methods:
@@ -61,7 +108,21 @@ extension TodoListViewController{
         //Prints the content of the array element at the indexPath:
         print(itemArray[indexPath.row])
         
-        //Deselects tableView cell at IndexPath:
+        /*Adds checkmark to ToDoItemCell for the item that's currently selected using indexPath:
+        */
+        
+        //If it already has a checkmark...
+        if (tableView.cellForRow(at: indexPath)?.accessoryType == .checkmark){
+            //...remove the checkmark:
+            tableView.cellForRow(at: indexPath)?.accessoryType = .none
+        }
+        //else if it doesn't...
+        else{
+            //...add the checkmark:
+            tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
+        }
+        
+        //Deselects tableView cell at IndexPath in animated fashion:
         tableView.deselectRow(at: indexPath, animated: true)
     }
 }
