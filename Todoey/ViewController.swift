@@ -8,7 +8,8 @@
 
 import UIKit
 
-class ViewController: UIViewController {
+//Change protocol to UITableViewController since that's what the view is:
+class ViewController: UITableViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
