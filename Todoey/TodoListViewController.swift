@@ -24,6 +24,12 @@ class TodoListViewController: UITableViewController {
         /*Sets the tableView delegate as "self" since it's extended below:
         */
         tableView.delegate = self
+        
+        /*Assigns and optionally-downcasts itemArray as whatever is in the defaults .plist as long as it's not nil:
+        */
+        if let items = defaults.array(forKey: K.listArray) as? [String]{
+            itemArray = items
+        }
     }
     
     override func didReceiveMemoryWarning() {
@@ -43,11 +49,11 @@ class TodoListViewController: UITableViewController {
             */
             print("Processed successfully.")
             
-            //Appends new item to itemArray as enteredText:
+            //Appends new item to itemArray as textField:
             self.itemArray.append(textField.text ?? "")
             
             //Saves user data in defaults with key "ToDoListArray":
-            self.defaults.set(self.itemArray, forKey: "ToDoListArray")
+            self.defaults.set(self.itemArray, forKey: K.listArray)
             
             //Reloads the data after the new item is added:
             DispatchQueue.main.async {

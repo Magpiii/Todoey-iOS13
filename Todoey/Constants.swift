@@ -9,6 +9,8 @@
 import Foundation
 
 struct K{
+    static let listArray = "ToDoListArray"
+    
     struct tableViewShit{
         static let cellIdentifier = "ToDoItemCell"
     }
