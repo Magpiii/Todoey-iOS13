@@ -8,6 +8,9 @@
 
 import UIKit
 
+//Must import CoreData to use it:
+import CoreData
+
 /*Change superclass to UITableViewController since that's what the view is. Also, no need for IBOutlets if you make the View Controller a subclass of the TableViewController:
 */
 class TodoListViewController: UITableViewController {
@@ -19,8 +22,12 @@ class TodoListViewController: UITableViewController {
     */
     let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Items.plist")
     
-    //Creates a new array of ListItem objects:
-    var itemArray = [ListItem]()
+    /*Initializes a context constant equal to the data obtained from the CoreData model by force-downcasting the UIApplication.shared (singleton) delegate as the AppDelegate.
+    */
+    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+    
+    //Creates a new array of Item objects from CoreData:
+    var itemArray = [Item]()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -40,11 +47,12 @@ class TodoListViewController: UITableViewController {
         //Makes sure the database is working on start:
         print(dataFilePath)
         
-        let newItem = ListItem()
+        //Initializes new item with context of the context constant above.
+        let newItem = Item(context: context)
         newItem.title = "Make to-do list."
         itemArray.append(newItem)
         
-        //Loads data from .plist on startup:
+        //Loads data from CoreData on startup:
         loadData()
     }
     
@@ -65,9 +73,15 @@ class TodoListViewController: UITableViewController {
             */
             print("Processed successfully.")
             
-            //Appends new item to itemArray as textField:
-            let newItem = ListItem()
+            //Makes a new item as an Item from CoreData:
+            let newItem = Item(context: self.context)
+            
             newItem.title = textField.text ?? ""
+            
+            //Sets the "done" Bool to false by default so it isn't checked:
+            newItem.done = false
+            
+            //Appends newItem to the itemArray:
             self.itemArray.append(newItem)
             
             /*Saves user data in defaults with key "ToDoListArray":
@@ -102,6 +116,59 @@ class TodoListViewController: UITableViewController {
         
     }
     
+
+
+//MARK: - Model Manipulation Methods:
+
+func saveData(){
+    //Creates a new encoder:
+    let encoder = PropertyListEncoder()
+    do{
+        /*
+        let data = try encoder.encode(itemArray)
+        Only force-unwrap your file path if you know it's correct (usually best to use Cosntants file/struct(s) here):
+        
+        try data.write(to: dataFilePath!)
+        */
+        try context.save()
+    } catch {
+        //Error catch:
+        print("Error saving data: \(error)")
+    }
+}
+
+func loadData(){
+    /*The folowing example is how to save data using a .plist:
+    
+    /*Creates data object (NOTE: only force unwrap if you know the dataFilePath exists (best to use constants file in this case)); using question mark "?" operator after "try" makes the value optional:
+    */
+    do{
+        /*
+        if let data = try? Data(contentsOf: dataFilePath!){
+            //Initializes decoder if there are no errors using optional binding:
+            let decoder = PropertyListDecoder()
+            /*Sets itemArray equal to the decoded data from the decoder (NOTE: must specify the data type in method call because Swift can't interpret the data type from the database yet. Hopefully that'll be a feature in the future):
+            */
+         */
+            try context.save()
+        } catch {
+        print("Error loading data: \(error)")
+    }
+}
+    */
+    
+    /*Creates a new request from CoreData using NSFetchRequest (data type is specified in the "<>" mainly for coder use, which is why it's important to specify the data type this way).
+    */
+    let request: NSFetchRequest<Item> = Item.fetchRequest()
+    
+    /*Uses the request constant to have the context fetch the data from CoreData and assign it to the itemArray:
+    */
+    do{
+        itemArray = try context.fetch(request)
+    } catch {
+        print("Error fetching data from context: \(error)")
+    }
+}
 }
 
 //MARK: - TableView Datasource Methods:
@@ -158,7 +225,14 @@ extension TodoListViewController{
         */
         let item = indexPath.row
         
+        /*Sets the title of the todo list item to "Completed" when the user taps on the item:
+        */
+        itemArray[item].setValue("Completed", forKey: "title")
+        
         print(item)
+        
+        //Saves data to CoreData:
+        saveData()
     
         
         //Prints the content of the array element at the indexPath:
@@ -178,43 +252,7 @@ extension TodoListViewController{
         //Deselects tableView cell at IndexPath in animated fashion:
         tableView.deselectRow(at: indexPath, animated: true)
     }
-    
-    //MARK: - Model Manipulation Methods:
-
-    func saveData(){
-        //Creates a new encoder:
-        let encoder = PropertyListEncoder()
-        do{
-            let data = try encoder.encode(itemArray)
-            /*Only force-unwrap your file path if you know it's correct (usually best to use Cosntants file/struct(s) here):
-            */
-            try data.write(to: dataFilePath!)
-        } catch {
-            //Error catch:
-            print("Error encoding itemArray: \(error)")
-        }
-    }
-    
-    func loadData(){
-        /*Creates data object (NOTE: only force unwrap if you know the dataFilePath exists (best to use constants file in this case)); using question mark "?" operator after "try" makes the value optional:
-        */
-        do{
-            if let data = try? Data(contentsOf: dataFilePath!){
-                //Initializes decoder if there are no errors using optional binding:
-                let decoder = PropertyListDecoder()
-                /*Sets itemArray equal to the decoded data from the decoder (NOTE: must specify the data type in method call because Swift can't interpret the data type from the database yet. Hopefully that'll be a feature in the future):
-                */
-                try itemArray = decoder.decode([ListItem].self, from: data)
-            }
-        } catch {
-            print("Error loading data: \(error)")
-        }
-        
-    }
-    
 }
-
-
 
 
 

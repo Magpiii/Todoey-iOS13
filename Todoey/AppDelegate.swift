@@ -18,7 +18,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         
-        /*Prints the content of the UserDefaults from the Documents directory using UID (unique device identifier):
+        /*Prints the filepath of the UserDefaults from the Documents directory using UID (unique device identifier):
         */
         print(NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).last! as String)
         return true
@@ -45,13 +45,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationWillTerminate(_ application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
         
-        /* Saves the data when the applicaiton closes:
-        saveData()
-        */
+        //Saves the data when the applicaiton closes:
+        self.saveContext()
+
     }
     
     // MARK: - Core Data stack
 
+    /*Lazy vars only get loaded when they're needed (also, NSPersistentContainer is a SQLite database):
+    */
     lazy var persistentContainer: NSPersistentContainer = {
         /*
          The persistent container for the application. This implementation
