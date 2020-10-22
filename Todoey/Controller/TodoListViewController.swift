@@ -26,12 +26,13 @@ class TodoListViewController: UITableViewController {
         */
         tableView.delegate = self
         
-        /*Example of how to assign and optionally-downcasts itemArray as whatever is in the defaults .plist as long as it's not nil:
+        /*Example of how to assign and optionally-downcasts itemArray as whatever is in the defaults .plist as long as it's not nil. NOTE: do not actually do it this way. UserDefaults is not meant to be used as an actual database for data for the app, like how one would use a SQL database or Firebase:
         
-        if let items = defaults.array(forKey: K.listArray) as? [String]{
+        if let items = defaults.array(forKey: K.listArray) as? [ListItem]{
             itemArray = items
         }
         */
+        
         
         let newItem = ListItem()
         newItem.title = "Make to-do list."
@@ -111,6 +112,13 @@ extension TodoListViewController {
         //Sets textLabel of each new cell as the appropriate item in itemArray:
         cell.textLabel?.text = item.title
         
+        /*How to set the accessory type using the ternary operator (value = condition ? valueIfTrue : valueIfFalse) (just like in C++). Very useful when working with booleans:
+        */
+        cell.accessoryType = item.done ? .checkmark : .none
+        
+        
+        /*Ternary operator basically does this, but shorter:
+         
         //If the item is done...
         if (item.done == true){
             //...applies checkmark to list item:
@@ -121,6 +129,7 @@ extension TodoListViewController {
             //Removes the accessory. 
             cell.accessoryType = .none
         }
+        */
             
         return cell
         }
@@ -136,18 +145,18 @@ extension TodoListViewController{
         */
         let item = indexPath.row
         
-        print(indexPath.row)
+        print(item)
     
         
         //Prints the content of the array element at the indexPath:
-        print(itemArray[indexPath.row])
+        print(itemArray[item])
         
         /*Adds checkmark to ToDoItemCell for the item that's currently selected using indexPath:
         */
         
         /*Sets the "done" boolean to the opposite of its current state, allowing the checkmark to either show or not show using the "done" boolean:
         */
-        itemArray[indexPath.row].done = !itemArray[indexPath.row].done
+        itemArray[item].done = !itemArray[item].done
          
         DispatchQueue.main.async {
             tableView.reloadData()
