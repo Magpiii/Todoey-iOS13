@@ -15,7 +15,8 @@ class TodoListViewController: UITableViewController {
     //Initializes user defaults:
     let defaults = UserDefaults.standard
     
-    var itemArray = ["Text Condor", "Text Nicc", "Text Nolaaaaaaaan"]
+    //Creates a new array of ListItem objects:
+    var itemArray = [ListItem]()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -25,11 +26,16 @@ class TodoListViewController: UITableViewController {
         */
         tableView.delegate = self
         
-        /*Assigns and optionally-downcasts itemArray as whatever is in the defaults .plist as long as it's not nil:
-        */
+        /*Example of how to assign and optionally-downcasts itemArray as whatever is in the defaults .plist as long as it's not nil:
+        
         if let items = defaults.array(forKey: K.listArray) as? [String]{
             itemArray = items
         }
+        */
+        
+        let newItem = ListItem()
+        newItem.title = "Make to-do list."
+        itemArray.append(newItem)
     }
     
     override func didReceiveMemoryWarning() {
@@ -50,7 +56,9 @@ class TodoListViewController: UITableViewController {
             print("Processed successfully.")
             
             //Appends new item to itemArray as textField:
-            self.itemArray.append(textField.text ?? "")
+            let newItem = ListItem()
+            newItem.title = textField.text ?? ""
+            self.itemArray.append(newItem)
             
             //Saves user data in defaults with key "ToDoListArray":
             self.defaults.set(self.itemArray, forKey: K.listArray)
@@ -96,8 +104,23 @@ extension TodoListViewController {
         */
         let cell = tableView.dequeueReusableCell(withIdentifier: K.tableViewShit.cellIdentifier, for: indexPath)
         
+        /*Creates item constant for the currently selected item in the tableView so I don't have to type "itemArray[indexPath.row]" so many goddamn times:
+        */
+        let item = itemArray[indexPath.row]
+        
         //Sets textLabel of each new cell as the appropriate item in itemArray:
-        cell.textLabel?.text = itemArray[indexPath.row]
+        cell.textLabel?.text = item.title
+        
+        //If the item is done...
+        if (item.done == true){
+            //...applies checkmark to list item:
+            cell.accessoryType = .checkmark
+        }
+        //Else if it's not done...
+        else{
+            //Removes the accessory. 
+            cell.accessoryType = .none
+        }
             
         return cell
         }
@@ -109,7 +132,12 @@ extension TodoListViewController {
  
 extension TodoListViewController{
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        /*Creates item constant for the currently selected item in the tableView so I don't have to type "indexPath.row" so many goddamn times:
+        */
+        let item = indexPath.row
+        
         print(indexPath.row)
+    
         
         //Prints the content of the array element at the indexPath:
         print(itemArray[indexPath.row])
@@ -117,15 +145,12 @@ extension TodoListViewController{
         /*Adds checkmark to ToDoItemCell for the item that's currently selected using indexPath:
         */
         
-        //If it already has a checkmark...
-        if (tableView.cellForRow(at: indexPath)?.accessoryType == .checkmark){
-            //...remove the checkmark:
-            tableView.cellForRow(at: indexPath)?.accessoryType = .none
-        }
-        //else if it doesn't...
-        else{
-            //...add the checkmark:
-            tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
+        /*Sets the "done" boolean to the opposite of its current state, allowing the checkmark to either show or not show using the "done" boolean:
+        */
+        itemArray[indexPath.row].done = !itemArray[indexPath.row].done
+         
+        DispatchQueue.main.async {
+            tableView.reloadData()
         }
         
         //Deselects tableView cell at IndexPath in animated fashion:
