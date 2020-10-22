@@ -15,6 +15,10 @@ class TodoListViewController: UITableViewController {
     //Initializes user defaults:
     let defaults = UserDefaults.standard
     
+    /*Creates a data file path to the documents directory of the device the app is running on; creates a new component file called "Items.plist" to store the itemArray property:
+    */
+    let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Items.plist")
+    
     //Creates a new array of ListItem objects:
     var itemArray = [ListItem]()
 
@@ -33,10 +37,15 @@ class TodoListViewController: UITableViewController {
         }
         */
         
+        //Makes sure the database is working on start:
+        print(dataFilePath)
         
         let newItem = ListItem()
         newItem.title = "Make to-do list."
         itemArray.append(newItem)
+        
+        //Loads data from .plist on startup:
+        loadData()
     }
     
     override func didReceiveMemoryWarning() {
@@ -61,8 +70,12 @@ class TodoListViewController: UITableViewController {
             newItem.title = textField.text ?? ""
             self.itemArray.append(newItem)
             
-            //Saves user data in defaults with key "ToDoListArray":
+            /*Saves user data in defaults with key "ToDoListArray":
             self.defaults.set(self.itemArray, forKey: K.listArray)
+            */
+            
+            //Saves user data to a .plist:
+            self.saveData()
             
             //Reloads the data after the new item is added:
             DispatchQueue.main.async {
@@ -165,7 +178,43 @@ extension TodoListViewController{
         //Deselects tableView cell at IndexPath in animated fashion:
         tableView.deselectRow(at: indexPath, animated: true)
     }
+    
+    //MARK: - Model Manipulation Methods:
+
+    func saveData(){
+        //Creates a new encoder:
+        let encoder = PropertyListEncoder()
+        do{
+            let data = try encoder.encode(itemArray)
+            /*Only force-unwrap your file path if you know it's correct (usually best to use Cosntants file/struct(s) here):
+            */
+            try data.write(to: dataFilePath!)
+        } catch {
+            //Error catch:
+            print("Error encoding itemArray: \(error)")
+        }
+    }
+    
+    func loadData(){
+        /*Creates data object (NOTE: only force unwrap if you know the dataFilePath exists (best to use constants file in this case)); using question mark "?" operator after "try" makes the value optional:
+        */
+        do{
+            if let data = try? Data(contentsOf: dataFilePath!){
+                //Initializes decoder if there are no errors using optional binding:
+                let decoder = PropertyListDecoder()
+                /*Sets itemArray equal to the decoded data from the decoder (NOTE: must specify the data type in method call because Swift can't interpret the data type from the database yet. Hopefully that'll be a feature in the future):
+                */
+                try itemArray = decoder.decode([ListItem].self, from: data)
+            }
+        } catch {
+            print("Error loading data: \(error)")
+        }
+        
+    }
+    
 }
+
+
 
 
 
