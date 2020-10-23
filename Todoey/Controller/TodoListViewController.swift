@@ -11,7 +11,7 @@ import UIKit
 //Must import CoreData to use it:
 import CoreData
 
-/*Change superclass to UITableViewController since that's what the view is. Also, no need for IBOutlets if you make the View Controller a subclass of the TableViewController:
+/*Change superclass to UITableViewController since that's what the view is. Also, no need for IBOutlets if you make the View Controller a subclass of the TableViewController (also conforms to UISearchBarDelegate since there's a search bar):
 */
 class TodoListViewController: UITableViewController {
     
@@ -33,6 +33,12 @@ class TodoListViewController: UITableViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         
+        /*Initializes tap as a gesture recognizer to close the keyboard if whitespace is tapped:
+        */
+        let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(UIInputViewController.dismissKeyboard))
+        
+        view.addGestureRecognizer(tap)
+        
         /*Sets the tableView delegate as "self" since it's extended below:
         */
         tableView.delegate = self
@@ -52,8 +58,15 @@ class TodoListViewController: UITableViewController {
         newItem.title = "Make to-do list."
         itemArray.append(newItem)
         
-        //Loads data from CoreData on startup:
+        /*Loads data from CoreData on startup (no need for an input parameter thanks to the "=" operator in loadData method):
+        */
         loadData()
+    }
+    
+    /*Causes the view (or one of its embedded text fields) to resign the first responder status and close the keyboard.
+    */
+    @objc func dismissKeyboard() {
+        view.endEditing(true)
     }
     
     override func didReceiveMemoryWarning() {
@@ -136,8 +149,9 @@ func saveData(){
         print("Error saving data: \(error)")
     }
 }
-
-func loadData(){
+    
+    //Using "=" provides a default input value for a function that takes inputs:
+    func loadData(with request: NSFetchRequest<Item> = Item.fetchRequest()){
     /*The folowing example is how to save data using a .plist:
     
     /*Creates data object (NOTE: only force unwrap if you know the dataFilePath exists (best to use constants file in this case)); using question mark "?" operator after "try" makes the value optional:
@@ -231,10 +245,6 @@ extension TodoListViewController{
         
         print(item)
         
-        //Saves data to CoreData:
-        saveData()
-    
-        
         //Prints the content of the array element at the indexPath:
         print(itemArray[item])
         
@@ -244,6 +254,19 @@ extension TodoListViewController{
         /*Sets the "done" boolean to the opposite of its current state, allowing the checkmark to either show or not show using the "done" boolean:
         */
         itemArray[item].done = !itemArray[item].done
+        
+        /*IMPORTANT NOTE: The following is an example of how to delete items from a CoreData database. The next 2 lines of code must be in order. Always operate on database objects before local objects:
+        
+        
+        //Deletes the item from the CoreData using "delete" predefined method of context:
+        context.delete(itemArray[item])
+        
+        //Removes the tapped item from itemArray at the index indexPath.row:
+        itemArray.remove(at: item)
+        */
+        
+        //Saves data to CoreData:
+        saveData()
          
         DispatchQueue.main.async {
             tableView.reloadData()
@@ -253,6 +276,55 @@ extension TodoListViewController{
         tableView.deselectRow(at: indexPath, animated: true)
     }
 }
+
+//MARK: - Search Bar Delegate Methods:
+
+    extension TodoListViewController: UISearchBarDelegate{
+        func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+            //Creates request from the CoreData for entity "Item":
+            let request: NSFetchRequest<Item> = Item.fetchRequest()
+            
+            /*Creates predicate for CoreData database search ("%@" escape sequence is replaced by whatever is in the searchBar "searchBar.text!" and CONTAINS operator is placed after the key so that the value can be found if it matches the query). The "[cd]" tells the query to ignore case and diacritics (diacritics is basically stuff like á and é) similarly to .toUpper() and .toLower() in C#:
+            */
+            let predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
+            
+            /*Sets the request's predicate (query) equal to the predicate constant that I just made:
+            */
+            request.predicate = predicate
+            
+            /*Since sortDescriptors is an array type (since you can technically search based on multiple criteria) the sortDescriptor for the key "title" (sorts by alphabetical order with the input "ascending: true.") is the only item in the array:
+            */
+            request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
+            
+            //Fetches the itemArray from the CoreData database with the input "request":
+            loadData(with: request)
+            
+            //Need to reload the tableView again since it'll have new data:
+            DispatchQueue.main.async{
+                self.tableView.reloadData()
+            }
+            
+            print(searchBar.text ?? "")
+        }
+        
+        /*This function resets the array to its previous state when the "x" button is pressed on the searchBar:
+        */
+        func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String){
+            /*If there are no characters in the searchBar (which would only happen if the user didn't type anything, the user pushed the "x" button, or the user deleted all the text)...
+            */
+            if (searchBar.text?.count == 0){
+                //Loads the data, which now has no query, so the original data is loaded:
+                loadData()
+                
+                /*Puts the keyboard away once the user taps the "x" on the searchBar or deletes all the text (need DispatchQueue since it's a UI foreground operation):
+                */
+                DispatchQueue.main.async {
+                    searchBar.resignFirstResponder()
+                }
+            }
+        }
+    }
+    
 
 
 
