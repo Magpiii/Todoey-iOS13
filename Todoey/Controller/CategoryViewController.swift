@@ -32,6 +32,9 @@ class CategoryViewController: UITableViewController {
 
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem
+        
+        //Loads data on view loading:
+        loadData()
     }
     
     /*Causes the view (or one of its embedded text fields) to resign the first responder status and close the keyboard.
@@ -191,4 +194,22 @@ class CategoryViewController: UITableViewController {
 }
     
     //MARK: - TableView Delegate Methods:
+extension CategoryViewController{
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        /*Takes the user to the list for the particular category using a segue with sender "self" (self becomes the IBAction):
+        */
+        performSegue(withIdentifier: "goToItems", sender: self)
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        let destinationVC = segue.destination as! TodoListViewController
+        
+        //Goes to the list related to the category that is selected (in CoreData):
+        if let indexPath = tableView.indexPathForSelectedRow{
+            /*Makes the TodoListViewController go to the list related to the appropriate category in the array of categories:
+            */
+            destinationVC.selectedCat = catArray[indexPath.row]
+        }
+    }
+}
     

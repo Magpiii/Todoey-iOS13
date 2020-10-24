@@ -22,6 +22,16 @@ class TodoListViewController: UITableViewController {
     */
     let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Items.plist")
     
+    //Creates optional variable for selected category in the CategoryView:
+    var selectedCat: Cat?{
+        /*"didSet" operator only gets executed once the computed property is in fact set with a value:
+        */
+        didSet{
+            //Loads data as soon as selectedCat is assigned a value:
+            loadData()
+        }
+    }
+    
     /*Initializes a context constant equal to the data obtained from the CoreData model by force-downcasting the UIApplication.shared (singleton) delegate as the AppDelegate.
     */
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
@@ -57,10 +67,6 @@ class TodoListViewController: UITableViewController {
         let newItem = Item(context: context)
         newItem.title = "Make to-do list."
         itemArray.append(newItem)
-        
-        /*Loads data from CoreData on startup (no need for an input parameter thanks to the "=" operator in loadData method):
-        */
-        loadData()
     }
     
     /*Causes the view (or one of its embedded text fields) to resign the first responder status and close the keyboard.
