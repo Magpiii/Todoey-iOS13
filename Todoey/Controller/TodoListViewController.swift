@@ -189,8 +189,7 @@ func saveData(){
 
 extension TodoListViewController {
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        /*Returns the amount of items in the itemArray (this allows the code to load new messages being sent/received):
-        */
+        //Returns the amount of items in the itemArray:
         return itemArray.count
     }
     

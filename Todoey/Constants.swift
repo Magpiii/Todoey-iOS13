@@ -13,5 +13,6 @@ struct K{
     
     struct tableViewShit{
         static let cellIdentifier = "ToDoItemCell"
+        static let catCellIdentifier = "CatCell"
     }
 }

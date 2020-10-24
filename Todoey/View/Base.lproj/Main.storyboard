@@ -39,7 +39,7 @@
                             <outlet property="delegate" destination="89T-Et-CZ7" id="ALe-33-OZq"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Todoey" id="4rS-2K-QS3">
+                    <navigationItem key="navigationItem" title="Items" id="4rS-2K-QS3">
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="YDE-RC-zGM">
                             <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             <connections>
@@ -85,7 +85,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <prototypes>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" restorationIdentifier="CategoryCell" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" id="Ver-yj-0d2">
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" restorationIdentifier="CategoryCell" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="CatCell" id="Ver-yj-0d2">
                                 <rect key="frame" x="0.0" y="28" width="414" height="43.5"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="Ver-yj-0d2" id="JtY-tw-xM5">
@@ -99,7 +99,14 @@
                             <outlet property="delegate" destination="SKF-e4-bcL" id="0sa-KT-X2G"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" id="EcX-Y2-ocZ"/>
+                    <navigationItem key="navigationItem" title="Todoey" id="EcX-Y2-ocZ">
+                        <barButtonItem key="rightBarButtonItem" systemItem="add" id="CKL-Fz-EKj">
+                            <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            <connections>
+                                <action selector="addButtonPressed:" destination="SKF-e4-bcL" id="lq7-K9-NE5"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                     <connections>
                         <segue destination="89T-Et-CZ7" kind="show" identifier="goToItems" id="d7T-zG-SXw"/>
                     </connections>
