@@ -66,6 +66,10 @@ class TodoListViewController: UITableViewController {
         //Initializes new item with context of the context constant above.
         let newItem = Item(context: context)
         newItem.title = "Make to-do list."
+        
+        //Sets the parentCat property of the newItem to the global selectedCat variable:
+        newItem.parentCat = self.selectedCat
+        
         itemArray.append(newItem)
     }
     
@@ -156,8 +160,9 @@ func saveData(){
     }
 }
     
-    //Using "=" provides a default input value for a function that takes inputs:
-    func loadData(with request: NSFetchRequest<Item> = Item.fetchRequest()){
+    /*Using "=" provides a default input value for a function that takes inputs (function takes in NSPredicate as well, allowing the use of multiple predicate per file with nil default value; NSPredicate must be optional in order to be assigned nil value):
+    */
+func loadData(with request: NSFetchRequest<Item> = Item.fetchRequest(), predicate: NSPredicate? = nil){
     /*The folowing example is how to save data using a .plist:
     
     /*Creates data object (NOTE: only force unwrap if you know the dataFilePath exists (best to use constants file in this case)); using question mark "?" operator after "try" makes the value optional:
@@ -177,6 +182,21 @@ func saveData(){
 }
     */
     
+    /*Creates a new search query for the parentcategory that exactly matches the string of the selected category (NOTE: MATCHES does not include [cd] in this case because it wouldn't need ignore case or diacritics for the variable anyway):
+    */
+    let catPredicate = NSPredicate(format: "parentCat.name MATCHES %@", selectedCat!.name!)
+    
+    //Optionally binds additionalPredicate to inputted predicate if it's not nil:
+    if let additionalPredicate = predicate{
+        /*Sets the search query equal to a compound predicate of the inputted predicate as well as the category so both can be searched in CoreData simultaneously:
+        */
+        request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [catPredicate, additionalPredicate])
+    }
+    //Else if it is nil...
+    else{
+        request.predicate = catPredicate
+    }
+        
     /*Creates a new request from CoreData using NSFetchRequest (data type is specified in the "<>" mainly for coder use, which is why it's important to specify the data type this way).
     */
     let request: NSFetchRequest<Item> = Item.fetchRequest()
@@ -302,7 +322,7 @@ extension TodoListViewController{
             request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
             
             //Fetches the itemArray from the CoreData database with the input "request":
-            loadData(with: request)
+            loadData(with: request, predicate: predicate)
             
             //Need to reload the tableView again since it'll have new data:
             DispatchQueue.main.async{
@@ -319,7 +339,7 @@ extension TodoListViewController{
             */
             if (searchBar.text?.count == 0){
                 //Loads the data, which now has no query, so the original data is loaded:
-                loadData()
+                loadData(predicate: predicate)
                 
                 /*Puts the keyboard away once the user taps the "x" on the searchBar or deletes all the text (need DispatchQueue since it's a UI foreground operation):
                 */
