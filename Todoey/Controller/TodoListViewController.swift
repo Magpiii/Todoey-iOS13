@@ -11,9 +11,13 @@ import UIKit
 //Must import CoreData to use it:
 import CoreData
 
+import RealmSwift
+
 /*Change superclass to UITableViewController since that's what the view is. Also, no need for IBOutlets if you make the View Controller a subclass of the TableViewController (also conforms to UISearchBarDelegate since there's a search bar):
 */
 class TodoListViewController: UITableViewController {
+    //Yes, you actually do have to init Realm() in every ViewController.
+    let realm = try! Realm()
     
     //Initializes user defaults:
     let defaults = UserDefaults.standard
@@ -39,7 +43,7 @@ class TodoListViewController: UITableViewController {
         */
         didSet{
             //Loads data as soon as selectedCat is assigned a value:
-            loadData()
+            loadFromRealm()
         }
     }
     
@@ -49,6 +53,9 @@ class TodoListViewController: UITableViewController {
     
     //Creates a new array of Item objects from CoreData:
     var itemArray = [Item]()
+    
+    //Sets a new array equal to the loaded data from realm:
+    var realmItems: Results<ListItem>?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -78,8 +85,14 @@ class TodoListViewController: UITableViewController {
         let newItem = Item(context: context)
         newItem.title = "Make to-do list."
         
-        //Sets the parentCat property of the newItem to the global selectedCat variable:
-        newItem.parentCat = self.selectedCat
+        let newRealmItem = ListItem()
+        
+        /*Sets the parentCat property of the newItem to the global selectedCat variable:
+        newItem = self.selectedCat
+        */
+        
+        //Loads data on View loading:
+        loadData()
         
         itemArray.append(newItem)
     }
@@ -193,21 +206,22 @@ func loadData(with request: NSFetchRequest<Item> = Item.fetchRequest(), predicat
 }
     */
     
-    /*Creates a new search query for the parentcategory that exactly matches the string of the selected category (NOTE: MATCHES does not include [cd] in this case because it wouldn't need ignore case or diacritics for the variable anyway):
+    /*CoreData example: Creates a new search query for the parentcategory that exactly matches the string of the selected category (NOTE: MATCHES does not include [cd] in this case because it wouldn't need ignore case or diacritics for the variable anyway):
     */
-    let catPredicate = NSPredicate(format: "parentCat.name MATCHES %@", selectedCat!.name!)
+    let catPredicate = NSPredicate(format: "parentCat.name MATCHES %@", selectedCat?.name ?? "")
     
     //Optionally binds additionalPredicate to inputted predicate if it's not nil:
     if let additionalPredicate = predicate{
         /*Sets the search query equal to a compound predicate of the inputted predicate as well as the category so both can be searched in CoreData simultaneously:
-        */
         request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [catPredicate, additionalPredicate])
+        
     }
     //Else if it is nil...
     else{
         request.predicate = catPredicate
     }
-        
+    */
+    
     /*Creates a new request from CoreData using NSFetchRequest (data type is specified in the "<>" mainly for coder use, which is why it's important to specify the data type this way).
     */
     let request: NSFetchRequest<Item> = Item.fetchRequest()
@@ -221,13 +235,22 @@ func loadData(with request: NSFetchRequest<Item> = Item.fetchRequest(), predicat
     }
 }
 }
-
+    func loadFromRealm(){
+        /*Sets the realmArray to the data gotten from the selectedCat object "items" property (uses the keyPath "title" in order to use the ListItem "title" property and sorts alphabetically with "ascending: true."):
+        */
+        realmItems = selectedCat?.items.sorted(byKeyPath: "title", ascending: true)
+    }
+}
 //MARK: - TableView Datasource Methods:
 
 extension TodoListViewController {
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        //Returns the amount of items in the itemArray:
+        /*Returns the amount of items in the itemArray:
         return itemArray.count
+        */
+        
+        //Returns the amount of items in realmItems, or 1 if it's nil.
+        return realmItems?.count ?? 1
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -236,16 +259,21 @@ extension TodoListViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: K.tableViewShit.cellIdentifier, for: indexPath)
         
         /*Creates item constant for the currently selected item in the tableView so I don't have to type "itemArray[indexPath.row]" so many goddamn times:
-        */
+        
         let item = itemArray[indexPath.row]
-        
-        //Sets textLabel of each new cell as the appropriate item in itemArray:
-        cell.textLabel?.text = item.title
-        
-        /*How to set the accessory type using the ternary operator (value = condition ? valueIfTrue : valueIfFalse) (just like in C++). Very useful when working with booleans:
         */
-        cell.accessoryType = item.done ? .checkmark : .none
         
+        //Safely unwraps item since it can be nil:
+        if let item = realmItems?[indexPath.row]{
+            //Sets textLabel of each new cell as the appropriate item in itemArray:
+            cell.textLabel?.text = item.title
+            
+            /*How to set the accessory type using the ternary operator (value = condition ? valueIfTrue : valueIfFalse) (just like in C++). Very useful when working with booleans:
+            */
+            cell.accessoryType = item.done ? .checkmark : .none
+        } else {
+            cell.textLabel?.text = "Add an item to get started."
+        }
         
         /*Ternary operator basically does this, but shorter:
          
