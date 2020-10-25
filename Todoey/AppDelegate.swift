@@ -9,6 +9,9 @@
 import UIKit
 import CoreData
 
+//Must import RealmSwift to use Realm:
+import RealmSwift
+
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 

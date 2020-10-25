@@ -339,7 +339,7 @@ extension TodoListViewController{
             */
             if (searchBar.text?.count == 0){
                 //Loads the data, which now has no query, so the original data is loaded:
-                loadData(predicate: predicate)
+                loadData()
                 
                 /*Puts the keyboard away once the user taps the "x" on the searchBar or deletes all the text (need DispatchQueue since it's a UI foreground operation):
                 */
