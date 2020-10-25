@@ -22,8 +22,19 @@ class TodoListViewController: UITableViewController {
     */
     let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Items.plist")
     
-    //Creates optional variable for selected category in the CategoryView:
+    /*Creates optional variable for selected category in the CategoryView:
     var selectedCat: Cat?{
+        /*"didSet" operator only gets executed once the computed property is in fact set with a value:
+        */
+        didSet{
+            //Loads data as soon as selectedCat is assigned a value:
+            loadData()
+        }
+    }
+    */
+    
+    //Does the same thing as above, but using Realm DB instead:
+    var selectedCat: ListCat?{
         /*"didSet" operator only gets executed once the computed property is in fact set with a value:
         */
         didSet{

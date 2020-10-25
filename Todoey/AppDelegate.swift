@@ -24,19 +24,22 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         //Prints the URL of where the Realm data is being stored:
         print(Realm.Configuration.defaultConfiguration.fileURL)
         
-        //Example initialization of Objective-C Data class:
+        /*Example initialization of Objective-C Data class:
         let data = Data()
         data.name = "Huntor"
         data.age = 23
+        */
         
         //Initializes new realm object:
         do{
             let realm = try Realm()
             
-            //Adds data object to realm database
-            try realm.add(data)
+            /*Adds data object to realm database
+            try realm.add(Data)
+            */
+            
         } catch {
-            print("A realm error occurred: \(error)")
+            print("A Realm error occurred: \(error)")
         }
 
         /*Prints the filepath of the UserDefaults from the Documents directory using UID (unique device identifier):

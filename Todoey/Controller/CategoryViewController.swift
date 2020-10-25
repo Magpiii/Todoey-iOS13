@@ -8,8 +8,13 @@
 
 import UIKit
 import CoreData
+import RealmSwift
 
 class CategoryViewController: UITableViewController {
+    
+    /*Must initialize Realm in ViewController too, but can force the "try" using the "!" operator. This is because when initializing Realm for the first time on an app, it technically can fail if resources are constrained. However, since we already initialize Realm on the AppDelegate, there's no need to handle the error in the ViewController:
+    */
+    let realm = try! Realm()
     
     /*Initializes a context constant equal to the data obtained from the CoreData model by force-downcasting the UIApplication.shared (singleton) delegate as the AppDelegate.
     */
@@ -17,6 +22,10 @@ class CategoryViewController: UITableViewController {
     
     //Creates a new array of Category items from CoreData:
     var catArray = [Cat]()
+    
+    /*Creates new Results list (which is basically an array) of ListCat objects from Realm (NOTE: no need to "append" to a Results list because Realm does it for you automatically):
+    */
+    var cats: Results<ListCat>?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -44,11 +53,23 @@ class CategoryViewController: UITableViewController {
     }
     
     //MARK: - Model Manipulation Methods:
-    func saveData(){
+    //Need to take in the ListCat so it can be saved to Realm:
+    func saveData(with cat: ListCat){
+        //Saves data to CoreData:
         do{
             try context.save()
         } catch {
             print("Error: \(error)")
+        }
+        
+        //Saves data to Realm DB:
+        do{
+            try realm.write{
+                //Saves the inputted category to Realm:
+                realm.add(cat)
+            }
+        } catch {
+            print("An error occurred while saving to Realm: \(error)")
         }
     }
     
@@ -64,6 +85,10 @@ class CategoryViewController: UITableViewController {
         } catch {
             print("Error fetching data from context: \(error)")
         }
+        
+        /*Sets a new cats constant equal to whatever is in Realm (NOTE: must use self in parameter that takes in Object type in Realm):
+        */
+        cats = realm.objects(ListCat.self)
     }
     
     //MARK: - Add New Categories:
@@ -80,13 +105,17 @@ class CategoryViewController: UITableViewController {
             //Makes a new Cat as an Item from CoreData:
             let newCat = Cat(context: self.context)
             
+            //Makes a new ListCat as a Realm object:
+            let newRealmCat = ListCat()
+            
             newCat.name = textField.text ?? ""
             
             //Appends newItem to the itemArray:
             self.catArray.append(newCat)
             
-            //Saves user data to a .plist:
+            /*Saves user data to a .plist:
             self.saveData()
+            */
             
             //Reloads the data after the new item is added:
             DispatchQueue.main.async {
@@ -117,8 +146,13 @@ class CategoryViewController: UITableViewController {
     // MARK: - Table view data source
     extension CategoryViewController{
         override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-            //Returns the amount of categories in the catArray: 
+            /*Returns the amount of categories in the catArray:
             return catArray.count
+            */
+            
+            /*Can use the ".count" operator on Realm Objects, too (returns 1 if cats is nil):
+            */
+            return cats?.count ?? 1
         }
         
         override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -130,8 +164,13 @@ class CategoryViewController: UITableViewController {
             */
             let cat = catArray[indexPath.row]
             
-            //Sets textLabel of each new cell as the appropriate item in itemArray:
+            /*Sets textLabel of each new cell as the appropriate item in itemArray:
             cell.textLabel?.text = cat.name
+            */
+            
+            /*Assigns the textLabel of the cell to the name of the appropriate ListCat Ojbect from Realm, or adds the label "Add a category to begin" if it's nil.
+            */
+            cell.textLabel?.text = cats?[indexPath.row].name ?? "Add a category to begin."
             
             return cell
         }
@@ -207,8 +246,11 @@ extension CategoryViewController{
         //Goes to the list related to the category that is selected (in CoreData):
         if let indexPath = tableView.indexPathForSelectedRow{
             /*Makes the TodoListViewController go to the list related to the appropriate category in the array of categories:
-            */
+            
             destinationVC.selectedCat = catArray[indexPath.row]
+            */
+            
+            destinationVC.selectedCat = cats?[indexPath.row]
         }
     }
 }

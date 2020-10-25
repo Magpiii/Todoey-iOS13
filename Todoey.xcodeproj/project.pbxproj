@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		5A0F334325420DD300BF6717 /* DataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 5A0F334125420DD300BF6717 /* DataModel.xcdatamodeld */; };
 		5A23590C25425A62002BE98A /* CategoryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A23590B25425A62002BE98A /* CategoryViewController.swift */; };
+		5A61D00C2545F3E5005B2878 /* ListCat.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A61D00B2545F3E5005B2878 /* ListCat.swift */; };
 		5A81B0A12540FC6E00004F8C /* ListItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A81B0A02540FC6E00004F8C /* ListItem.swift */; };
 		5A87FDB62540B0C7003B9C5B /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A87FDB52540B0C7003B9C5B /* Constants.swift */; };
 		5AC62F5625450133000AAA5F /* Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AC62F5525450133000AAA5F /* Data.swift */; };
@@ -23,6 +24,7 @@
 /* Begin PBXFileReference section */
 		5A0F334225420DD300BF6717 /* DataModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = DataModel.xcdatamodel; sourceTree = "<group>"; };
 		5A23590B25425A62002BE98A /* CategoryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryViewController.swift; sourceTree = "<group>"; };
+		5A61D00B2545F3E5005B2878 /* ListCat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListCat.swift; sourceTree = "<group>"; };
 		5A81B0A02540FC6E00004F8C /* ListItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListItem.swift; sourceTree = "<group>"; };
 		5A87FDB52540B0C7003B9C5B /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		5AC62F5525450133000AAA5F /* Data.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Data.swift; sourceTree = "<group>"; };
@@ -79,6 +81,7 @@
 			isa = PBXGroup;
 			children = (
 				5A81B0A02540FC6E00004F8C /* ListItem.swift */,
+				5A61D00B2545F3E5005B2878 /* ListCat.swift */,
 				5A0F334125420DD300BF6717 /* DataModel.xcdatamodeld */,
 				5AC62F5525450133000AAA5F /* Data.swift */,
 			);
@@ -246,6 +249,7 @@
 				5A81B0A12540FC6E00004F8C /* ListItem.swift in Sources */,
 				5A0F334325420DD300BF6717 /* DataModel.xcdatamodeld in Sources */,
 				EB2BE4FE239524DB00FB933B /* TodoListViewController.swift in Sources */,
+				5A61D00C2545F3E5005B2878 /* ListCat.swift in Sources */,
 				EB2BE4FA239524DB00FB933B /* AppDelegate.swift in Sources */,
 				5A23590C25425A62002BE98A /* CategoryViewController.swift in Sources */,
 				5A87FDB62540B0C7003B9C5B /* Constants.swift in Sources */,
