@@ -77,7 +77,7 @@
 			path = Controller;
 			sourceTree = "<group>";
 		};
-		5A81B0A42540FC8100004F8C /* Model */ = {
+		5A81B0A42540FC8100004F8C /* Data Model */ = {
 			isa = PBXGroup;
 			children = (
 				5A81B0A02540FC6E00004F8C /* ListItem.swift */,
@@ -85,7 +85,7 @@
 				5A0F334125420DD300BF6717 /* DataModel.xcdatamodeld */,
 				5AC62F5525450133000AAA5F /* Data.swift */,
 			);
-			path = Model;
+			path = "Data Model";
 			sourceTree = "<group>";
 		};
 		8C621877D27EE6B24EF441B3 /* Pods */ = {
@@ -120,7 +120,7 @@
 			children = (
 				5A87FDB52540B0C7003B9C5B /* Constants.swift */,
 				EB2BE4F9239524DB00FB933B /* AppDelegate.swift */,
-				5A81B0A42540FC8100004F8C /* Model */,
+				5A81B0A42540FC8100004F8C /* Data Model */,
 				5A81B09D2540FC2500004F8C /* View */,
 				5A81B09E2540FC3200004F8C /* Controller */,
 				EB2BE502239524DC00FB933B /* Assets.xcassets */,

@@ -20,6 +20,7 @@ class ListItem: Codable{
 class ListItem: Object{
     @objc dynamic var title: String = ""
     @objc dynamic var done: Bool = false
+    @objc dynamic var dateCreated: Date?
     
     //When using Realm, parent data types are declared programatically as shown below:
     var parentCat = LinkingObjects(fromType: ListCat.self, property: "items")

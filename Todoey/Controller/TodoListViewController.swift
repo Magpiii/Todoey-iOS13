@@ -123,16 +123,40 @@ class TodoListViewController: UITableViewController {
             //Makes a new item as an Item from CoreData:
             let newItem = Item(context: self.context)
             
+            //MARK: - Save data to Realm:
+            
             //Inits new realmItem:
             let newRealmItem = ListItem()
             
             //Safely unwraps currentCategory:
-            if let currentCategory = self.selectedCat{
+            if let currentCat = self.selectedCat{
                 //Initializes newRealmItem's title as whatever is in the textField:
                 newRealmItem.title = textField.text ?? ""
                 
                 newRealmItem.done = false
+                
+                //Sets the dateCreated property in Realm using a new Date object:
+                newRealmItem.dateCreated = Date()
+                
+                /*Appends a new item to the currentCat, which is initialized as the selectedCat from the previous screen:
+                */
+                currentCat.items.append(newRealmItem)
+                
+                //Saves data to Realm DB:
+                do{
+                    try self.realm.write{
+                        //Saves the inputted category to Realm:
+                        self.realm.add(newRealmItem)
+                    }
+                } catch {
+                    print("An error occurred while saving to Realm: \(error)")
+                }
             }
+            
+            DispatchQueue.main.async {
+                self.tableView.reloadData()
+            }
+            //MARK: - End save data to Realm:
 
             newItem.title = textField.text ?? ""
             
@@ -141,16 +165,6 @@ class TodoListViewController: UITableViewController {
             
             //Appends newItem to the itemArray:
             self.itemArray.append(newItem)
-            
-            //Saves data to Realm DB:
-            do{
-                try self.realm.write{
-                    //Saves the inputted category to Realm:
-                    self.realm.add(newRealmItem)
-                }
-            } catch {
-                print("An error occurred while saving to Realm: \(error)")
-            }
             
             /*Saves user data in defaults with key "ToDoListArray":
             self.defaults.set(self.itemArray, forKey: K.listArray)
@@ -256,6 +270,8 @@ func loadData(with request: NSFetchRequest<Item> = Item.fetchRequest(), predicat
     }
 }
 }
+    
+    //MARK: - Load from Realm:
     func loadFromRealm(){
         /*Sets the realmArray to the data gotten from the selectedCat object "items" property (uses the keyPath "title" in order to use the ListItem "title" property and sorts alphabetically with "ascending: true."):
         */
@@ -359,6 +375,28 @@ extension TodoListViewController{
         
         //Deselects tableView cell at IndexPath in animated fashion:
         tableView.deselectRow(at: indexPath, animated: true)
+        
+        //MARK: - Update Data in Realm:
+        //Safely upwrap realmItem at equal to the selected cell.
+        if let realmItem = realmItems?[indexPath.row]{
+            do{
+                try realm.write{
+                    /*If the item is done, it makes it not done if checked, or vice versa using Realm:
+                    */
+                    realmItem.done = !realmItem.done
+                    
+                    //MARK: - Delete data in Realm:
+                    //realm.delete(realmItem)
+                }
+            } catch {
+                print("An error occured while updating Realm: \(error)")
+            }
+        }
+        DispatchQueue.main.async {
+            tableView.reloadData()
+        }
+        
+        
     }
 }
 
@@ -379,7 +417,7 @@ extension TodoListViewController{
             
             /*Since sortDescriptors is an array type (since you can technically search based on multiple criteria) the sortDescriptor for the key "title" (sorts by alphabetical order with the input "ascending: true.") is the only item in the array:
             */
-            request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
+            request.sortDescriptors = [NSSortDescriptor(key: "dateCreated", ascending: true)]
             
             //Fetches the itemArray from the CoreData database with the input "request":
             loadData(with: request, predicate: predicate)
@@ -390,6 +428,15 @@ extension TodoListViewController{
             }
             
             print(searchBar.text ?? "")
+            
+            //MARK: - Realm:
+            /*The "filter" predefined method of the Results data type in Realm filters search results using an NSPredicate and argument which what will be queried (kind of like CoreData, but it's less of a pain in the ass). REMEMBER: the [c] ignores case for the query, and the [d] ignores diacritics. Using the "sorted" predefined method, one can sort based on the key (dateCreated in this case) and in reverse chronological order using "ascending" boolean:
+            */
+            realmItems = realmItems?.filter("title CONTAINS[cd] %@", searchBar.text ?? "").sorted(byKeyPath: "dateCreated", ascending: true)
+            
+            DispatchQueue.main.async {
+                self.tableView.reloadData()
+            }
         }
         
         /*This function resets the array to its previous state when the "x" button is pressed on the searchBar:
@@ -407,6 +454,7 @@ extension TodoListViewController{
                     searchBar.resignFirstResponder()
                 }
             }
+            
         }
     }
     

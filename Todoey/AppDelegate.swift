@@ -88,7 +88,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         /*Always change name of container to the name of the containing folder in the "name" property:
         */
-        let container = NSPersistentContainer(name: "Model")
+        let container = NSPersistentContainer(name: "Data Model")
         container.loadPersistentStores(completionHandler: { (storeDescription, error) in
             if let error = error as NSError? {
                 // Replace this implementation with code to handle the error appropriately.

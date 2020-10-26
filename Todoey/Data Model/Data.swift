@@ -14,7 +14,7 @@ import RealmSwift
 
 //Create new class Data that derives from Object (Realm data always derives from Object):
 class Data: Object{
-    /*Realm variables must be marked with @objc as they are coded in the objective-C language:
+    /*Realm variables must be marked with @objc as they are coded in the objective-C language (and also "dynamic" keyword to be updated automatically in Realm):
     */
     @objc dynamic var name: String = ""
     

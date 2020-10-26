@@ -10,6 +10,9 @@ import UIKit
 import CoreData
 import RealmSwift
 
+//Must import SwipeCellKit to use it:
+import SwipeCellKit
+
 class CategoryViewController: UITableViewController {
     
     /*Must initialize Realm in ViewController too, but can force the "try" using the "!" operator. This is because when initializing Realm for the first time on an app, it technically can fail if resources are constrained. However, since we already initialize Realm on the AppDelegate, there's no need to handle the error in the ViewController:
@@ -156,9 +159,12 @@ class CategoryViewController: UITableViewController {
         }
         
         override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-            /*Creates a new tableView cell with the prototype identified from the Constants file for element item in itemArray:
+            /*Creates a new tableView cell with the prototype identified from the DB for element item in itemArray (downcasts as SwipeTableViewCell using predefined subclass):
             */
-            let cell = tableView.dequeueReusableCell(withIdentifier: K.tableViewShit.catCellIdentifier, for: indexPath)
+            let cell = tableView.dequeueReusableCell(withIdentifier: K.tableViewShit.catCellIdentifier, for: indexPath) as! SwipeTableViewCell
+            
+            //Sets the cell delegate to self in order to use SwipeCellKit:
+            cell.delegate = self
             
             /*Creates item constant for the currently selected item in the tableView so I don't have to type "itemArray[indexPath.row]" so many goddamn times:
             */
