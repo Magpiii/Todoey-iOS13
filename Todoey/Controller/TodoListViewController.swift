@@ -123,6 +123,17 @@ class TodoListViewController: UITableViewController {
             //Makes a new item as an Item from CoreData:
             let newItem = Item(context: self.context)
             
+            //Inits new realmItem:
+            let newRealmItem = ListItem()
+            
+            //Safely unwraps currentCategory:
+            if let currentCategory = self.selectedCat{
+                //Initializes newRealmItem's title as whatever is in the textField:
+                newRealmItem.title = textField.text ?? ""
+                
+                newRealmItem.done = false
+            }
+
             newItem.title = textField.text ?? ""
             
             //Sets the "done" Bool to false by default so it isn't checked:
@@ -130,6 +141,16 @@ class TodoListViewController: UITableViewController {
             
             //Appends newItem to the itemArray:
             self.itemArray.append(newItem)
+            
+            //Saves data to Realm DB:
+            do{
+                try self.realm.write{
+                    //Saves the inputted category to Realm:
+                    self.realm.add(newRealmItem)
+                }
+            } catch {
+                print("An error occurred while saving to Realm: \(error)")
+            }
             
             /*Saves user data in defaults with key "ToDoListArray":
             self.defaults.set(self.itemArray, forKey: K.listArray)
