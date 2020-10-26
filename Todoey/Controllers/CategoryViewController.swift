@@ -13,7 +13,7 @@ import RealmSwift
 //Must import SwipeCellKit to use it:
 import SwipeCellKit
 
-class CategoryViewController: UITableViewController {
+class CategoryViewController: UITableViewController{
     
     /*Must initialize Realm in ViewController too, but can force the "try" using the "!" operator. This is because when initializing Realm for the first time on an app, it technically can fail if resources are constrained. However, since we already initialize Realm on the AppDelegate, there's no need to handle the error in the ViewController:
     */
@@ -32,6 +32,9 @@ class CategoryViewController: UITableViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        //Increases the height of the cell so the entire trash icon fits: 
+        tableView.rowHeight = 80.0
         
         /*Initializes tap as a gesture recognizer to close the keyboard if whitespace is tapped:
         */
@@ -260,4 +263,6 @@ extension CategoryViewController{
         }
     }
 }
+
+//MARK: - SwipeView Delegate Methods:
     
