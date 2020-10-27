@@ -57,6 +57,13 @@ class CategoryViewController: SwipeTableViewController{
         loadData()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        guard let navBar = navigationController?.navigationBar else { fatalError("Navigation controller failed to load.") }
+        
+        //Sets the default backgroundColor to blue using hexidecimal code:
+        navBar.backgroundColor = HexColor(hexString: "1D9BF6")
+    }
+    
     /*Causes the view (or one of its embedded text fields) to resign the first responder status and close the keyboard.
     */
     @objc func dismissKeyboard() {
@@ -198,6 +205,10 @@ class CategoryViewController: SwipeTableViewController{
             
             //Sets the cell label as the selected indexPath for the appropriate category: 
             cell.textLabel?.text = cats?[indexPath.row].name ?? "Add a category to get started."
+            
+            /*Sets the backgroundColor of the textLabel as the contrasting color of the current category, else contrast-conforming white if nil (NOTE: nil coalescing a default hex color if it's nil is not actually a good way to do this. This is just an example of how to do so):
+            */
+            cell.textLabel?.backgroundColor = ContrastColorOf(backgroundColor: HexColor(hexString: cats?[indexPath.row].color ?? "FFFFFF"), returnFlat: true)
             
             //Sets the cell color to the stored color, or white if it's nil:
             cell.backgroundColor = HexColor(hexString: cats?[indexPath.row].color ?? "FFFFFF")

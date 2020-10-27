@@ -62,8 +62,22 @@ class TodoListViewController: SwipeTableViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         
+        /*Sets navigationController navigationBar to the selected category's color (safely unwraps colorHex first since the selectedCat can technically be nil):
+        */
+        if let colorHex = selectedCat?.color{
+            /*Using "guard let" keyphrase, one can throw a fatal error if a constant turns out to be nil.
+            
+            guard let navBar = navigationController?.navigationBar else { fatalError("Navigation bar does not exist.") }
+            */
+            
+            navigationController?.navigationBar.tintColor = HexColor(hexString: colorHex)
+        }
+        
         //Sets tableView's rowHeight to 80 pts so that it can fit the trash icon:
         tableView.rowHeight = 80.0
+        
+        //Remove seperator from tableView since there's color functionality now:
+        tableView.separatorStyle = .none
         
         /*Initializes tap as a gesture recognizer to close the keyboard if whitespace is tapped:
         */
@@ -100,6 +114,37 @@ class TodoListViewController: SwipeTableViewController {
         
         itemArray.append(newItem)
     }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        if let colorHex = selectedCat?.color{
+            /*Since selectedCat is already optionally bound above, you can just force unwrap it here:
+            */
+            title = selectedCat!.name
+            
+            /*Using "guard let" keyphrase, one can throw a fatal error if a constant turns out to be nil.
+            */
+            guard let navBar = navigationController?.navigationBar else { fatalError("Navigation bar does not exist.") }
+            
+            /*If there is no fatal error (navigationController is not nil), assign the value of the hex color to its tintColor property:
+            */
+            navBar.backgroundColor = HexColor(hexString: colorHex)
+            
+            /*Sets the tint color to the contrast of the background color for the navigation bar (optionally bound because backgroundColor can be nil):
+            */
+            if let backColor = navBar.backgroundColor{
+                navBar.tintColor = ContrastColorOf(backgroundColor: backColor, returnFlat: true)
+                
+                /*Sets the titleText as a dictionary equal to the foreground color (key) ContrastColorOf the background color (value).
+                */
+                navBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor : ContrastColorOf(backgroundColor: backColor, returnFlat: true)]
+                
+                //Sets teh search bar color to the same color as the navigation bar:
+                searchBar.tintColor = HexColor(hexString: colorHex)
+            }
+        }
+    }
+    
+    @IBOutlet weak var searchBar: UISearchBar!
     
     /*Causes the view (or one of its embedded text fields) to resign the first responder status and close the keyboard.
     */
@@ -317,6 +362,13 @@ extension TodoListViewController {
         let item = itemArray[indexPath.row]
         */
         
+        /*Sets a new constant catColor to the selectedCat's color, otherwise color scheme-matching white if nil:
+        */
+        let catColor = HexColor(hexString: selectedCat?.color ?? "FFFFFF")
+        
+        //Checks value of catColor
+        print(catColor)
+        
         //Safely unwraps item since it can be nil:
         if let item = realmItems?[indexPath.row]{
             //Sets textLabel of each new cell as the appropriate item in itemArray:
@@ -326,11 +378,16 @@ extension TodoListViewController {
             */
             cell.accessoryType = item.done ? .checkmark : .none
             
-            /*Sets cell background color to Flat Sky Blue from Chameleon Framework darkened by the position in the array of the current item divided by the current number of items in the Results list:
+            /*Force unwraps realmItems since this line won't run if realmItems is nil thanks to the above if-let optional binding statement; sets cell background color to Flat Sky Blue from Chameleon Framework darkened by the position in the array of the current item divided by the current number of items in the Results list:
             */
-            cell.backgroundColor = FlatSkyBlue().darkenByPercentage(
-                CGFloat(indexPath.row / realmItems?.count)
-                )
+            if let color = catColor.darken(byPercentage: CGFloat(indexPath.row) / CGFloat(realmItems!.count))
+            {
+                cell.backgroundColor = color
+                
+                /*Sets the textLabel?.textColor of the new cell as contrasting with the background color "color" above using Chameleon Framework:
+                */
+                cell.textLabel?.textColor = ContrastColorOf(backgroundColor: color, returnFlat: true)
+            }
         } else {
             cell.textLabel?.text = "Add an item to get started."
         }
