@@ -10,6 +10,9 @@ import UIKit
 import CoreData
 import RealmSwift
 
+//Must import Chameleon Framework to use it:
+import ChameleonFramework
+
 //The ViewController now inherits from the superclass for the swipable cells.
 class CategoryViewController: SwipeTableViewController{
     
@@ -33,6 +36,10 @@ class CategoryViewController: SwipeTableViewController{
         
         //Increases the height of the cell so the entire trash icon fits: 
         tableView.rowHeight = 80.0
+        
+        /*Removes the separator from the cells since the separator is pointless due to ChameleonFramework colors:
+        */
+        tableView.separatorStyle = .none
         
         /*Initializes tap as a gesture recognizer to close the keyboard if whitespace is tapped:
         */
@@ -187,6 +194,10 @@ class CategoryViewController: SwipeTableViewController{
             
             //Sets the cell label as the selected indexPath for the appropriate category: 
             cell.textLabel?.text = cats?[indexPath.row].name ?? "Add a category to get started."
+            
+            /*Sets the cell's background color to a random flat UIColor using the Chameleon framework:
+            */
+            cell.backgroundColor = UIColor.randomFlat()?.hexValue()
             
             /*Sets the cell delegate to self in order to use SwipeCellKit:
             cell.delegate = self

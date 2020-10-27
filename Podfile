@@ -11,4 +11,7 @@ target 'Todoey' do
   # Pod for SwipeCellKit
   pod 'SwipeCellKit'
   
+  # Pod for Chamelion Framework
+  pod 'ChameleonFramework/Swift'
+  
 end
