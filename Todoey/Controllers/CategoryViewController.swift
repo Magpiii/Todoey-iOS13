@@ -10,10 +10,8 @@ import UIKit
 import CoreData
 import RealmSwift
 
-//Must import SwipeCellKit to use it:
-import SwipeCellKit
-
-class CategoryViewController: UITableViewController{
+//The ViewController now inherits from the superclass for the swipable cells.
+class CategoryViewController: SwipeTableViewController{
     
     /*Must initialize Realm in ViewController too, but can force the "try" using the "!" operator. This is because when initializing Realm for the first time on an app, it technically can fail if resources are constrained. However, since we already initialize Realm on the AppDelegate, there's no need to handle the error in the ViewController:
     */
@@ -163,23 +161,19 @@ class CategoryViewController: UITableViewController{
         
         override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
             /*Creates a new tableView cell with the prototype identified from the DB for element item in itemArray (downcasts as SwipeTableViewCell using predefined subclass):
-            */
+            
             let cell = tableView.dequeueReusableCell(withIdentifier: K.tableViewShit.catCellIdentifier, for: indexPath) as! SwipeTableViewCell
+            */
             
-            //Sets the cell delegate to self in order to use SwipeCellKit:
+            //Initializes tableView cells in this ViewController using superclass:
+            let cell = super.tableView(tableView, cellForRowAt: indexPath)
+            
+            //Sets the cell label as the selected indexPath for the appropriate category: 
+            cell.textLabel?.text = cats?[indexPath.row].name ?? "Add a category to get started."
+            
+            /*Sets the cell delegate to self in order to use SwipeCellKit:
             cell.delegate = self
-            
-            /*Creates item constant for the currently selected item in the tableView so I don't have to type "itemArray[indexPath.row]" so many goddamn times:
             */
-            let cat = catArray[indexPath.row]
-            
-            /*Sets textLabel of each new cell as the appropriate item in itemArray:
-            cell.textLabel?.text = cat.name
-            */
-            
-            /*Assigns the textLabel of the cell to the name of the appropriate ListCat Ojbect from Realm, or adds the label "Add a category to begin" if it's nil.
-            */
-            cell.textLabel?.text = cats?[indexPath.row].name ?? "Add a category to begin."
             
             return cell
         }
