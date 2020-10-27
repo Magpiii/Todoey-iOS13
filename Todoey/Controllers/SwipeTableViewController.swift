@@ -26,7 +26,6 @@ class SwipeTableViewController: UITableViewController, SwipeTableViewCellDelegat
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         /*Creates a new tableView cell with the prototype identified from the DB for element item in itemArray (downcasts as SwipeTableViewCell using predefined subclass):
         */
-        
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! SwipeTableViewCell
         
         //Sets the delegate of the cell to self:

@@ -95,6 +95,23 @@ class CategoryViewController: SwipeTableViewController{
         cats = realm.objects(ListCat.self)
     }
     
+    //MARK: - Delete Data from Swipe:
+    
+    /*Overrides the superclass method updateModel() to delete data from Realm using the Swipe action:
+    */
+    override func updateModel(at indexPath: IndexPath){
+        //Deletes the data from realm if item is not nil:
+        if let catToBeDeleted = self.cats?[indexPath.row]{
+            do{
+                try self.realm.write{
+                    self.realm.delete(catToBeDeleted)
+                    }
+            } catch {
+                print("An error occurred while deleting data: \(error)")
+            }
+        }
+    }
+    
     //MARK: - Add New Categories:
     @IBAction func addButtonPressed(_ sender: UIBarButtonItem) {
         /*Creates new alert that prompts the user to type in a new to do list item:

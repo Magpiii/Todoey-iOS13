@@ -15,7 +15,7 @@ import RealmSwift
 
 /*Change superclass to UITableViewController since that's what the view is. Also, no need for IBOutlets if you make the View Controller a subclass of the TableViewController (also conforms to UISearchBarDelegate since there's a search bar):
 */
-class TodoListViewController: UITableViewController {
+class TodoListViewController: SwipeTableViewController {
     //Yes, you actually do have to init Realm() in every ViewController.
     let realm = try! Realm()
     
@@ -60,6 +60,9 @@ class TodoListViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
+        
+        //Sets tableView's rowHeight to 80 pts so that it can fit the trash icon:
+        tableView.rowHeight = 80.0
         
         /*Initializes tap as a gesture recognizer to close the keyboard if whitespace is tapped:
         */
@@ -270,6 +273,19 @@ func loadData(with request: NSFetchRequest<Item> = Item.fetchRequest(), predicat
     }
 }
 }
+    //MARK: - Delete Data in Realm:
+    override func updateModel(at indexPath: IndexPath){
+        //Deletes the data from realm if item is not nil:
+        if let itemToBeDeleted = self.realmItems?[indexPath.row]{
+            do{
+                try self.realm.write{
+                    self.realm.delete(itemToBeDeleted)
+                    }
+            } catch {
+                print("An error occurred while deleting data: \(error)")
+            }
+        }
+    }
     
     //MARK: - Load from Realm:
     func loadFromRealm(){
@@ -293,7 +309,7 @@ extension TodoListViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         /*Creates a new tableView cell with the prototype identified from the Constants file for element item in itemArray:
         */
-        let cell = tableView.dequeueReusableCell(withIdentifier: K.tableViewShit.cellIdentifier, for: indexPath)
+        let cell = super.tableView(tableView, cellForRowAt: indexPath)
         
         /*Creates item constant for the currently selected item in the tableView so I don't have to type "itemArray[indexPath.row]" so many goddamn times:
         
@@ -385,8 +401,9 @@ extension TodoListViewController{
                     */
                     realmItem.done = !realmItem.done
                     
-                    //MARK: - Delete data in Realm:
-                    //realm.delete(realmItem)
+                    /*Deletes data in Realm:
+                    realm.delete(realmItem)
+                    */
                 }
             } catch {
                 print("An error occured while updating Realm: \(error)")
@@ -395,8 +412,6 @@ extension TodoListViewController{
         DispatchQueue.main.async {
             tableView.reloadData()
         }
-        
-        
     }
 }
 
