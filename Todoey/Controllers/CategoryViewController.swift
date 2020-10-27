@@ -137,6 +137,10 @@ class CategoryViewController: SwipeTableViewController{
             let newRealmCat = ListCat()
             
             newCat.name = textField.text ?? ""
+            newRealmCat.name = textField.text ?? ""
+            
+            //Sets the newRealmCat's color to a random UIColor from the Chameleon Framework:
+            newRealmCat.color = UIColor.randomFlat()?.hexValue()
             
             //Appends newItem to the itemArray:
             self.catArray.append(newCat)
@@ -195,9 +199,9 @@ class CategoryViewController: SwipeTableViewController{
             //Sets the cell label as the selected indexPath for the appropriate category: 
             cell.textLabel?.text = cats?[indexPath.row].name ?? "Add a category to get started."
             
-            /*Sets the cell's background color to a random flat UIColor using the Chameleon framework:
-            */
-            cell.backgroundColor = UIColor.randomFlat()?.hexValue()
+            //Sets the cell color to the stored color, or white if it's nil:
+            cell.backgroundColor = HexColor(hexString: cats?[indexPath.row].color ?? "FFFFFF")
+            
             
             /*Sets the cell delegate to self in order to use SwipeCellKit:
             cell.delegate = self
@@ -285,6 +289,3 @@ extension CategoryViewController{
         }
     }
 }
-
-//MARK: - SwipeView Delegate Methods:
-    

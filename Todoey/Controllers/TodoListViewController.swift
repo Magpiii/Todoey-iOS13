@@ -12,6 +12,7 @@ import UIKit
 import CoreData
 
 import RealmSwift
+import ChameleonFramework
 
 /*Change superclass to UITableViewController since that's what the view is. Also, no need for IBOutlets if you make the View Controller a subclass of the TableViewController (also conforms to UISearchBarDelegate since there's a search bar):
 */
@@ -324,6 +325,12 @@ extension TodoListViewController {
             /*How to set the accessory type using the ternary operator (value = condition ? valueIfTrue : valueIfFalse) (just like in C++). Very useful when working with booleans:
             */
             cell.accessoryType = item.done ? .checkmark : .none
+            
+            /*Sets cell background color to Flat Sky Blue from Chameleon Framework darkened by the position in the array of the current item divided by the current number of items in the Results list:
+            */
+            cell.backgroundColor = FlatSkyBlue().darkenByPercentage(
+                CGFloat(indexPath.row / realmItems?.count)
+                )
         } else {
             cell.textLabel?.text = "Add an item to get started."
         }
